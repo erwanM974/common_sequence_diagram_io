@@ -28,10 +28,10 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
     fn get_operator_at_root(&self) -> Option<CioII::InteractionOperatorType>;
 
     /** 
-     * If at the root of the interaction there is the given operator, then returns its sub-interactions.
-     * Otherwise returns None.
+     * Returns the sub-interactions of the given interaction.
+     * If it is an operator symbol of arity 0, it returns an empty vec![].
      * **/
-     fn get_subinteractions_under_operator<'a>(&'a self,operator : &CioII::InteractionOperatorType) -> Option<Vec<&'a Self>>;
+    fn get_subinteractions<'a>(&'a self) -> Vec<&'a Self>;
 
     /**
      * If at the root of the interaction there is a given leaf patter, then returns it.
@@ -43,20 +43,32 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
      * A tool function to recursively get all the sub-interactions under an associative operator.
      * For instance, if applied to "f(a,f(b,c))" where "f" is associative, it will return "[a,b,c]".
      * **/
-    fn get_associative_operands_recursively<'a>(&'a self,operator : &CioII::InteractionOperatorType) -> Vec<&'a Self> {
-        //assert!(operator.is_associative());
+    fn get_associative_operands_recursively<'a>(
+        &'a self,
+        considered_associative_operator : &CioII::InteractionOperatorType
+    ) -> Vec<&'a Self> {
+        // ***
+        let consider_sub_interactions = match self.get_operator_at_root() {
+            None => {
+                false
+            },
+            Some(got_at_root) => {
+                &got_at_root == considered_associative_operator
+            }
+        };
         // ***
         let mut operands : Vec<&Self> = Vec::new();
-        match self.get_subinteractions_under_operator(operator) {
-            None => {
-                operands.push(self);
-            },
-            Some(subints) => {
-                for sub_int in subints {
-                    operands.extend( sub_int.get_associative_operands_recursively(operator) );
-                }
+        // ***
+        if consider_sub_interactions {
+            for sub_int in self.get_subinteractions() {
+                operands.extend( 
+                    sub_int.get_associative_operands_recursively(considered_associative_operator) 
+                );
             }
+        } else {
+            operands.push(self);
         }
+        // ***
         operands
     }
 
@@ -75,7 +87,7 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
                 let operands = if op_at_root.is_associative() {
                     self.get_associative_operands_recursively(&op_at_root)
                 } else {
-                    self.get_subinteractions_under_operator(&op_at_root).unwrap()
+                    self.get_subinteractions()
                 };
                 let operands_reprs = operands.into_iter().map(
                     |x| x.to_io_repr()

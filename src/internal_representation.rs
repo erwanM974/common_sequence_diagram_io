@@ -44,7 +44,7 @@ pub trait CommonIoInteractionInterface : Sized {
     /**
      The type of the operators of the specific Interaction Language we are considering.
      **/
-    type InteractionOperatorType : Debug + InteractionOperatorRepresentation + Clone;
+    type InteractionOperatorType : Debug + InteractionOperatorRepresentation + Clone + PartialEq + Eq;
 
 }
 

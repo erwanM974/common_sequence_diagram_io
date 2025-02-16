@@ -48,26 +48,29 @@ impl MinimalAction {
 
 impl FromInteractionTermToInternalRepresentation<MinimalLangCioII> for MinimalInteraction {
 
-    fn get_subinteractions_under_operator<'a>(&'a self,operator : &MinimalOperators) -> Option<Vec<&'a Self>> {
-        match (self,operator) {
-            (MinimalInteraction::Strict(i1, i2), MinimalOperators::Strict) => {
-                Some(vec![&*i1,&*i2])
+    fn get_subinteractions<'a>(&'a self) -> Vec<&'a Self> {
+        match self {
+            MinimalInteraction::Strict(i1, i2) => {
+                vec![&*i1,&*i2]
             },
-            (MinimalInteraction::Seq(i1, i2), MinimalOperators::Seq) => {
-                Some(vec![&*i1,&*i2])
+            MinimalInteraction::Seq(i1, i2) => {
+                vec![&*i1,&*i2]
             },
-            (MinimalInteraction::Alt(i1, i2), MinimalOperators::Alt) => {
-                Some(vec![&*i1,&*i2])
+            MinimalInteraction::Alt(i1, i2) => {
+                vec![&*i1,&*i2]
             },
-            (MinimalInteraction::Par(i1, i2), MinimalOperators::Par) => {
-                Some(vec![&*i1,&*i2])
+            MinimalInteraction::Par(i1, i2) => {
+                vec![&*i1,&*i2]
             },
-            (MinimalInteraction::Loop(i1), MinimalOperators::Loop) => {
-                Some(vec![&*i1])
-            },
-            (_,_) => {
-                None 
+            MinimalInteraction::Loop(i1)=> {
+                vec![&*i1]
             }
+            MinimalInteraction::Empty => {
+                vec![]
+            },
+            MinimalInteraction::Action(_) => {
+                vec![]
+            },
         }
     }
     
