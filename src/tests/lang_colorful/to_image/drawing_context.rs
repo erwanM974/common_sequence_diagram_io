@@ -24,6 +24,7 @@ use image_colored_text::text::line::ColoredTextLine;
 use maplit::hashset;
 
 
+use crate::internal_representation::InteractionInternalRepresentation;
 use crate::tests::common::*;
 use crate::to_image::common_interaction_drawer::CommonInteractionDrawerTrait;
 use crate::to_image::draw::context_aware_drawer::ContextAwareInteractionDrawer;
@@ -193,7 +194,7 @@ impl ContextAwareInteractionDrawingInstructionsExtractor<ColorfulLangCioII,usize
         Some(DrawableBroadcastLeafPattern::new(message,line_style,origin,lifeline_targets,gate_targets))
     }
 
-    fn to_drawable_operator(&self, op : &ColorfulOperators) -> DrawableOperator<usize> {
+    fn to_drawable_operator(&self, op : &ColorfulOperators, _sub_ints : &[InteractionInternalRepresentation<ColorfulLangCioII>]) -> DrawableOperator<usize> {
         match op {
             &ColorfulOperators::Coreg(None) => {
                 DrawableOperator::new(Rgb(COLORFUL_BLACK),DrawableOperatorKind::CoRegionLike(HashSet::new()))

@@ -17,6 +17,7 @@ limitations under the License.
 
 
 
+use crate::internal_representation::InteractionInternalRepresentation;
 use crate::to_text::context_aware_printer::ContextAwareInteractionPrinter;
 
 use crate::tests::lang_minimal::minimal_lang::*;
@@ -37,7 +38,11 @@ impl ContextAwareInteractionPrinter<MinimalLangCioII> for GeneralContext {
         ","
     }
 
-    fn print_operator(&self, operator : &MinimalOperators) -> String {
+    fn print_operator(
+        &self, 
+        operator : &MinimalOperators,
+        _sub_ints : &[InteractionInternalRepresentation<MinimalLangCioII>]
+    ) -> String {
         operator.as_lowercase_string()
     }
 

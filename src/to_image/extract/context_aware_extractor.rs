@@ -24,7 +24,7 @@ use std::collections::HashSet;
 
 use image_colored_text::text::paragraph::ColoredTextParagraph;
 
-use crate::internal_representation::CommonIoInteractionInterface;
+use crate::internal_representation::{CommonIoInteractionInterface, InteractionInternalRepresentation};
 use crate::to_image::common_interaction_drawer::CommonInteractionDrawerTrait;
 use crate::to_image::drawable::operator::builtin_operator::DrawableOperator;
 use crate::to_image::drawable::leaf::broadcast::DrawableBroadcastLeafPattern;
@@ -46,7 +46,14 @@ pub trait ContextAwareInteractionDrawingInstructionsExtractor<
      * **/
     fn to_drawable_pattern(&self, pattern : &CioII::InteractionLeafPatternType) -> Option<DrawableBroadcastLeafPattern<LI>>;
 
-    fn to_drawable_operator(&self, op : &CioII::InteractionOperatorType) -> DrawableOperator<LI>;
+    /** 
+     * Returns how to draw the given operator, also taking into account the sub-interactions underneath.
+     * **/
+    fn to_drawable_operator(
+        &self, 
+        op : &CioII::InteractionOperatorType,
+        sub_ints : &[InteractionInternalRepresentation<CioII>]
+    ) -> DrawableOperator<LI>;
 
 }
 

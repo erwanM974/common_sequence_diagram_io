@@ -25,7 +25,14 @@ pub trait ContextAwareInteractionPrinter<CioII : CommonIoInteractionInterface> {
     fn right_parenthesis(&self) -> &str;
     fn operand_separator(&self) -> &str;
 
-    fn print_operator(&self, operator : &CioII::InteractionOperatorType) -> String;
+    /** 
+     * Returns how to print the given operator, also taking into account the sub-interactions underneath.
+     * **/
+    fn print_operator(
+        &self, 
+        operator : &CioII::InteractionOperatorType,
+        sub_ints : &[InteractionInternalRepresentation<CioII>]
+    ) -> String;
 
     fn print_explicit_pattern(&self, leaf_pattern : &CioII::InteractionLeafPatternType) -> String;
 
@@ -38,7 +45,7 @@ pub trait ContextAwareInteractionPrinter<CioII : CommonIoInteractionInterface> {
                 format!("{}{}", "\t".repeat(depth), self.print_explicit_pattern(leaf))
             },
             InteractionInternalRepresentation::Operator(op, sub_ints ) => {
-                let first_line : &str = &format!("{}{}{}", "\t".repeat(depth), self.print_operator(op), self.left_parenthesis());
+                let first_line : &str = &format!("{}{}{}", "\t".repeat(depth), self.print_operator(op,sub_ints), self.left_parenthesis());
                 let inner_lines : Vec<String> = sub_ints.iter()
                 .map(|sub_int| self.print_interaction_inner(depth + 1, sub_int))
                 .collect();

@@ -23,6 +23,7 @@ use image_colored_text::text::paragraph::*;
 use image_colored_text::text::line::ColoredTextLine;
 
 
+use crate::internal_representation::InteractionInternalRepresentation;
 use crate::tests::common::*;
 use crate::tests::lang_minimal::minimal_lang::GeneralContext;
 use crate::to_image::common_interaction_drawer::CommonInteractionDrawerTrait;
@@ -175,7 +176,11 @@ impl ContextAwareInteractionDrawingInstructionsExtractor<MinimalLangCioII,usize>
         }
     }
 
-    fn to_drawable_operator(&self, op : &MinimalOperators) -> DrawableOperator<usize> {
+    fn to_drawable_operator(
+        &self, 
+        op : &MinimalOperators,
+        _sub_ints : &[InteractionInternalRepresentation<MinimalLangCioII>]
+    ) -> DrawableOperator<usize> {
         if op == &MinimalOperators::Seq {
             DrawableOperator::new(Rgb(MY_COLOR_BLACK),DrawableOperatorKind::CoRegionLike(HashSet::new()))
         } else {

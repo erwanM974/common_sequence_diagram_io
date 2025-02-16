@@ -114,7 +114,10 @@ pub fn extract_intermediate_drawing_information_rec<CioII,LI,Context>
             },
             InteractionInternalRepresentation::Operator(operator, sub_ints) => {
                 let mut op_operands_positions = vec![*ypos];
-                let drawable_operator = context.to_drawable_operator(operator);
+                let drawable_operator = context.to_drawable_operator(
+                    operator,
+                    sub_ints
+                );
                 let operator_info = drawable_operator.get_intermediate_information(
                     context.get_scale(),
                     context.get_font(),
