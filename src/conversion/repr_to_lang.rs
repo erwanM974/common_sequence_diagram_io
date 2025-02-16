@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 
-use crate::core::internal_representation::{InteractionInternalRepresentation,InteractionOperatorRepresentation,CommonIoInteractionInterface};
+use crate::internal_representation::{InteractionInternalRepresentation,InteractionOperatorRepresentation,CommonIoInteractionInterface};
 
 
 

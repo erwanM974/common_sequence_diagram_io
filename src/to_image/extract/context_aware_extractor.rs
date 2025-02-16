@@ -24,7 +24,7 @@ use std::collections::HashSet;
 
 use image_colored_text::text::paragraph::ColoredTextParagraph;
 
-use crate::core::internal_representation::CommonIoInteractionInterface;
+use crate::internal_representation::CommonIoInteractionInterface;
 use crate::to_image::common_interaction_drawer::CommonInteractionDrawerTrait;
 use crate::to_image::drawable::operator::builtin_operator::DrawableOperator;
 use crate::to_image::drawable::leaf::broadcast::DrawableBroadcastLeafPattern;

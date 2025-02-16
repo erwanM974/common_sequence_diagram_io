@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 
-use crate::core::internal_representation::*;
+use crate::internal_representation::*;
 use crate::tests::lang_colorful::colorful_lang::*;
 
 

@@ -22,7 +22,7 @@ use nom::sequence::{delimited, tuple};
 use nom::IResult;
 use nom::error::ParseError;
 
-use crate::core::internal_representation::{InteractionInternalRepresentation,CommonIoInteractionInterface};
+use crate::internal_representation::{InteractionInternalRepresentation,CommonIoInteractionInterface};
 use crate::from_text::util::delimited_lang_parser::DelimitedInteractionLanguageParser;
 
 pub trait ContextAwareInteractionParser<CioII : CommonIoInteractionInterface> : DelimitedInteractionLanguageParser {

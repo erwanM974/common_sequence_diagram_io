@@ -24,7 +24,7 @@ use std::collections::{HashMap, HashSet};
 use image_colored_text::text::paragraph::ColoredTextParagraph;
 
 
-use crate::core::internal_representation::*;
+use crate::internal_representation::*;
 use crate::to_image::extract::context_aware_extractor::ContextAwareInteractionDrawingInstructionsExtractor;
 use crate::to_image::drawable::leaf::info::LifelineRequiredHorizontalSpaceInDiagram;
 use crate::to_image::extract::instructions::*;

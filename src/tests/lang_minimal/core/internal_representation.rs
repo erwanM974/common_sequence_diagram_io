@@ -17,7 +17,7 @@ limitations under the License.
 
 
 
-use crate::core::internal_representation::*;
+use crate::internal_representation::*;
 
 #[derive(Debug,Clone)]
 pub struct MinimalLangCioII {}

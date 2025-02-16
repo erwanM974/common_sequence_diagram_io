@@ -15,8 +15,8 @@ limitations under the License.
 */
 
 
-use crate::core::internal_representation::CommonIoInteractionInterface;
-use crate::core::internal_representation::InteractionInternalRepresentation;
+use crate::internal_representation::CommonIoInteractionInterface;
+use crate::internal_representation::InteractionInternalRepresentation;
 
 
 pub trait ContextAwareInteractionPrinter<CioII : CommonIoInteractionInterface> {

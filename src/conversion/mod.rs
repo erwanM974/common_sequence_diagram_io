@@ -15,8 +15,5 @@ limitations under the License.
 */
 
 
-
-
-pub mod internal_representation;
 pub mod repr_to_lang;
 pub mod lang_to_repr;

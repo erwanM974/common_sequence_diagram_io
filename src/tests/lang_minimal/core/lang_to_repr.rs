@@ -17,7 +17,7 @@ limitations under the License.
 
 
 
-use crate::core::lang_to_repr::FromInteractionTermToInternalRepresentation;
+use crate::conversion::lang_to_repr::FromInteractionTermToInternalRepresentation;
 use crate::tests::lang_minimal::minimal_lang::*;
 use crate::tests::lang_minimal::core::internal_representation::*;
 

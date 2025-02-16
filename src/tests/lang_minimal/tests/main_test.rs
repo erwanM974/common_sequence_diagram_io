@@ -22,8 +22,8 @@ use crate::tests::lang_minimal::minimal_lang::{GeneralContext, MinimalInteractio
 use crate::from_text::parse::parse_interaction;
 use crate::tests::lang_minimal::to_image::drawing_context::MinimalDrawingContext;
 use crate::to_text::print::print_interaction;
-use crate::core::lang_to_repr::FromInteractionTermToInternalRepresentation;
-use crate::core::repr_to_lang::FromInternalRepresentationToInteractionTerm;
+use crate::conversion::lang_to_repr::FromInteractionTermToInternalRepresentation;
+use crate::conversion::repr_to_lang::FromInternalRepresentationToInteractionTerm;
 
 use crate::to_image::interface::draw_interaction_as_sequence_diagram;
 

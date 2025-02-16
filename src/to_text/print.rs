@@ -16,7 +16,7 @@ limitations under the License.
 
 
 
-use crate::core::internal_representation::{CommonIoInteractionInterface, InteractionInternalRepresentation};
+use crate::internal_representation::{CommonIoInteractionInterface, InteractionInternalRepresentation};
 use crate::to_text::context_aware_printer::ContextAwareInteractionPrinter;
 
 

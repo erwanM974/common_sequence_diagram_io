@@ -30,7 +30,7 @@ use image_colored_text::text::line::*;
 use crate::from_text::context_aware_parser::ContextAwareInteractionParser;
 use crate::tests::lang_colorful::colorful_lang::*;
 use crate::tests::lang_colorful::core::internal_representation::*;
-use crate::core::internal_representation::*;
+use crate::internal_representation::*;
 
 
 

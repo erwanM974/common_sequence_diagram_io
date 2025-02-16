@@ -20,7 +20,7 @@ use std::path::PathBuf;
 use std::hash::Hash;
 
 
-use crate::core::internal_representation::*;
+use crate::internal_representation::*;
 use crate::to_image::extract::context_aware_extractor::ContextAwareInteractionDrawingInstructionsExtractor;
 use crate::to_image::draw::context_aware_drawer::ContextAwareInteractionDrawer;
 

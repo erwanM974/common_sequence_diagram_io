@@ -16,8 +16,8 @@ limitations under the License.
 
 
 
-
-pub mod core;
+pub mod internal_representation;
+pub mod conversion;
 
 #[cfg(feature = "from_text")]
 pub mod from_text;

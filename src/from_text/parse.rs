@@ -20,7 +20,7 @@ limitations under the License.
 use nom::error::VerboseError;
 
 use crate::from_text::context_aware_parser::ContextAwareInteractionParser;
-use crate::core::internal_representation::{CommonIoInteractionInterface, InteractionInternalRepresentation};
+use crate::internal_representation::{CommonIoInteractionInterface, InteractionInternalRepresentation};
 
 
 

@@ -26,7 +26,7 @@ use nom::IResult;
 use crate::from_text::context_aware_parser::ContextAwareInteractionParser;
 use crate::tests::lang_minimal::minimal_lang::*;
 use crate::tests::lang_minimal::core::internal_representation::*;
-use crate::core::internal_representation::*;
+use crate::internal_representation::*;
 
 
 
