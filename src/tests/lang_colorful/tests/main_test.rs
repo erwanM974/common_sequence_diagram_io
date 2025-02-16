@@ -17,6 +17,8 @@ limitations under the License.
 
 
 
+use std::path::Path;
+
 use image::Rgb;
 use image_colored_text::text::line::ColoredTextLine;
 use image_colored_text::text::paragraph::{ColoredTextParagraph, MultiLineTextAlignment};
@@ -104,6 +106,7 @@ r#"seq(
     draw_interaction_as_sequence_diagram::<ColorfulLangCioII,usize,ColorfulDrawingContext,ColorfulDrawingContext>(
         &internal_repr,
         &drawing_context,
-        &drawing_context,&".".to_owned(),&name
+        &drawing_context,
+        &Path::new(&format!("{}.png",name))
     );
 }

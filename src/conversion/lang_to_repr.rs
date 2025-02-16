@@ -31,7 +31,7 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
      * Returns the sub-interactions of the given interaction.
      * If it is an operator symbol of arity 0, it returns an empty vec![].
      * **/
-    fn get_subinteractions<'a>(&'a self) -> Vec<&'a Self>;
+    fn get_subinteractions(&self) -> Vec<&Self>;
 
     /**
      * If at the root of the interaction there is a given leaf patter, then returns it.

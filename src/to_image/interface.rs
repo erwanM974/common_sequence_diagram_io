@@ -16,7 +16,7 @@ limitations under the License.
 
 
 
-use std::path::PathBuf;
+use std::path::Path;
 use std::hash::Hash;
 
 
@@ -31,8 +31,7 @@ pub fn draw_interaction_as_sequence_diagram<CioII,LI,Extractor,Drawer> (
     int_repr : &InteractionInternalRepresentation<CioII>,
     extractor : &Extractor,
     palette : &Drawer,
-    parent_folder : &String,
-    output_file_name : &String
+    file_path : &Path,
 )
 where 
     CioII : CommonIoInteractionInterface,
@@ -45,13 +44,11 @@ where
         extractor,
         int_repr
     );
-    let output_file_name = format!("{:}.png", output_file_name);
-    let output_path : PathBuf = [parent_folder, &output_file_name].iter().collect();
     let image = make_image_from_display_information::<LI,Drawer>(
         palette,
         &display_info
     );
-    let _ = image.save(output_path.as_path());
+    let _ = image.save(file_path);
 }
 
 

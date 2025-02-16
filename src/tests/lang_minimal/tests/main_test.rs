@@ -17,6 +17,8 @@ limitations under the License.
 
 
 
+use std::path::Path;
+
 use crate::tests::lang_minimal::core::internal_representation::*;
 use crate::tests::lang_minimal::minimal_lang::{GeneralContext, MinimalInteraction};
 use crate::from_text::parse::parse_interaction;
@@ -73,7 +75,8 @@ fn tool_test_verify_parsing_and_two_way_conversions(
     draw_interaction_as_sequence_diagram::<MinimalLangCioII,usize,MinimalDrawingContext,MinimalDrawingContext>(
         &retranslated_internal_repr,
         &drawing_context,
-        &drawing_context,&".".to_owned(),&interaction_name
+        &drawing_context,
+        &Path::new(&format!("{}.png",interaction_name))
     );
 }
 
