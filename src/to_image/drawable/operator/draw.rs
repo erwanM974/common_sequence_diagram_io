@@ -59,7 +59,7 @@ impl<LI : Eq + Hash + Copy + Clone> DrawableOperator<LI> {
                 }
             },
             DrawableOperatorKind::Framed(label) => {
-                let leftmost_lf = *enclosed_lfs_reqs.keys()
+                if let Some(leftmost_lf) = enclosed_lfs_reqs.keys()
                     .min_by(|l1,l2|
                         {
                             let l1_x_pos = *lifelines_horizontal_positions.get(l1).unwrap();
@@ -67,30 +67,31 @@ impl<LI : Eq + Hash + Copy + Clone> DrawableOperator<LI> {
                             l1_x_pos.partial_cmp(&l2_x_pos).unwrap()
                         }
                     )
-                    .unwrap();
-                let rightmost_lf = *enclosed_lfs_reqs.keys()
+                {
+                    if let Some(rightmost_lf) = enclosed_lfs_reqs.keys()
                     .max_by(|l1,l2|
                         {
                             let l1_x_pos = *lifelines_horizontal_positions.get(l1).unwrap();
                             let l2_x_pos = *lifelines_horizontal_positions.get(l2).unwrap();
                             l1_x_pos.partial_cmp(&l2_x_pos).unwrap()
                         }
-                    )
-                    .unwrap();
-                draw_combined_fragment_frame(
-                    image, 
-                    label, 
-                    enclosed_lfs_reqs, 
-                    nest_padding, 
-                    horizontal_seps_vertical_positions, 
-                    leftmost_lf, 
-                    rightmost_lf, 
-                    lifelines_horizontal_positions, 
-                    self.frame_color, 
-                    margin_between_items, 
-                    font, 
-                    scale
-                );
+                    ) {
+                        draw_combined_fragment_frame(
+                            image, 
+                            label, 
+                            enclosed_lfs_reqs, 
+                            nest_padding, 
+                            horizontal_seps_vertical_positions, 
+                            *leftmost_lf, 
+                            *rightmost_lf, 
+                            lifelines_horizontal_positions, 
+                            self.frame_color, 
+                            margin_between_items, 
+                            font, 
+                            scale
+                        );
+                    }
+                }
             }
         }
     }

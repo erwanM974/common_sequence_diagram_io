@@ -162,16 +162,14 @@ pub fn extract_intermediate_drawing_information_rec<CioII,LI,Context>
                     }
                 }
                 // the left most inner lifeline may require additional space on its left for drawing the operator label
-                {
-                    let leftmost_lf_id = *op_included_lifelines.iter()
-                        .min_by(|l1,l2|
-                            {
-                                let l1_idx = all_lifelines_in_diagram.iter().position(|l| l == *l1).unwrap();
-                                let l2_idx = all_lifelines_in_diagram.iter().position(|l| l == *l2).unwrap();
-                                l1_idx.cmp(&l2_idx)
-                            }
-                        )
-                        .unwrap();
+                if let Some(leftmost_lf_id) = op_included_lifelines.iter()
+                    .min_by(|l1,l2|
+                        {
+                            let l1_idx = all_lifelines_in_diagram.iter().position(|l| l == *l1).unwrap();
+                            let l2_idx = all_lifelines_in_diagram.iter().position(|l| l == *l2).unwrap();
+                            l1_idx.cmp(&l2_idx)
+                        }
+                    ) {
                     let letftmost_lf_reqs = lifelines_reqs.get_mut(&leftmost_lf_id).unwrap();
                     letftmost_lf_reqs.on_the_left = f32::max(
                         letftmost_lf_reqs.on_the_left, 
