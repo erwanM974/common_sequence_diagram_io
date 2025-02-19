@@ -98,20 +98,19 @@ impl FromInteractionTermToInternalRepresentation<MinimalLangCioII> for MinimalIn
     }
 
 
-
-    fn identify_pattern_at_interaction_root(&self) -> Option<MinimalLeafPattern> {
+    fn identify_pattern_at_interaction_root<'a>(&'a self) -> Option<(MinimalLeafPattern,Option<(MinimalOperators,&'a Self)>)> {
         match self {
             MinimalInteraction::Empty => {
-                return Some(MinimalLeafPattern::EMPTY);
+                return Some((MinimalLeafPattern::EMPTY,None));
             },
             MinimalInteraction::Action(act) => {
-                return Some(act.to_pattern());
+                return Some((act.to_pattern(),None));
             },
             MinimalInteraction::Strict(i1, i2) => {
                 if let MinimalInteraction::Action(ref emission) = **i1 {
                     if emission.kind == MinimalActionKind::Emission {
                         // if on the left of the strict we have an emission "act1 = l1!m1"
-                        if let Some(MinimalLeafPattern::BROADCAST(b2)) = i2.identify_pattern_at_interaction_root() {
+                        if let Some((MinimalLeafPattern::BROADCAST(b2),_)) = i2.identify_pattern_at_interaction_root() {
                             if b2.origin_lf_id.is_none() && b2.msg_id == emission.ms_id {
                                 // and on the right of the strict we have identified a pattern of the form "seq(l2?m1,...)" i.e.
                                 // a broadcast pattern with no known origin and the same message "m1"
@@ -122,7 +121,7 @@ impl FromInteractionTermToInternalRepresentation<MinimalLangCioII> for MinimalIn
                                     emission.ms_id,
                                     b2.targets
                                 );
-                                return Some(MinimalLeafPattern::BROADCAST(broadcast));
+                                return Some((MinimalLeafPattern::BROADCAST(broadcast),None));
                             }
                         }
                     } 
@@ -131,8 +130,8 @@ impl FromInteractionTermToInternalRepresentation<MinimalLangCioII> for MinimalIn
             },
             MinimalInteraction::Seq(i1, i2) => {
                 if let (
-                    Some(MinimalLeafPattern::BROADCAST(b1)),
-                    Some(MinimalLeafPattern::BROADCAST(b2))
+                    Some((MinimalLeafPattern::BROADCAST(b1),_)),
+                    Some((MinimalLeafPattern::BROADCAST(b2),_))
                 ) = (i1.identify_pattern_at_interaction_root(),i2.identify_pattern_at_interaction_root()) {
                     let same_message = b1.msg_id == b2.msg_id;
                     let no_origin_b1 = b1.origin_lf_id.is_none();
@@ -141,13 +140,14 @@ impl FromInteractionTermToInternalRepresentation<MinimalLangCioII> for MinimalIn
                         let mut targets = b1.targets;
                         targets.extend(b2.targets);
                         return Some(
-                            MinimalLeafPattern::BROADCAST(
+                            (MinimalLeafPattern::BROADCAST(
                                 MinimalBroadcastLeafPattern::new(
                                     b1.origin_lf_id, 
                                     b1.msg_id, 
                                     targets
                                 )
-                            )
+                            ),
+                            None)
                         );
                     }
                 }

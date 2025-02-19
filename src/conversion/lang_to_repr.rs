@@ -35,15 +35,18 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
 
     /**
      * If at the root of the interaction there is a given leaf patter, then returns it.
-     * Otherwose returns None.
+     * Otherwise returns None.
+     * If found, we may also return a "remainder".
+     * For instance, if we have a term of the form OP(x,OP(y,z)) where OP(x,y) can be identifier as a pattern P, then
+     * it will return Some(P,Some(OP,z))
      * **/
-    fn identify_pattern_at_interaction_root(&self) -> Option<CioII::InteractionLeafPatternType>;
+    fn identify_pattern_at_interaction_root<'a>(&'a self) -> Option<(CioII::InteractionLeafPatternType,Option<(CioII::InteractionOperatorType,&'a Self)>)>;
 
     /** 
      * A tool function to recursively get all the sub-interactions under an associative operator.
      * For instance, if applied to "f(a,f(b,c))" where "f" is associative, it will return "[a,b,c]".
      * **/
-    fn get_associative_operands_recursively<'a>(
+     fn get_associative_operands_recursively<'a>(
         &'a self,
         considered_associative_operator : &CioII::InteractionOperatorType
     ) -> Vec<&'a Self> {
@@ -77,8 +80,19 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
      * **/
      fn to_io_repr(&self) -> InteractionInternalRepresentation<CioII> {
         match self.identify_pattern_at_interaction_root() {
-            Some(pattern) => {
-                InteractionInternalRepresentation::LeafPattern(pattern)
+            Some((pattern,may_remain)) => {
+                let pattern_int_repr = InteractionInternalRepresentation::LeafPattern(pattern);
+                if let Some((remainder_op,remainder)) = may_remain {
+                    InteractionInternalRepresentation::Operator(
+                        remainder_op, 
+                        vec![
+                            pattern_int_repr,
+                            remainder.to_io_repr()
+                        ]
+                    )
+                } else {
+                    pattern_int_repr
+                }
             },
             None => {
                 // patterns must cover all non-operator symbols (more precisely all operators of arity 0)
