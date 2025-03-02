@@ -48,7 +48,7 @@ impl MinimalAction {
 
 impl FromInteractionTermToInternalRepresentation<MinimalLangCioII> for MinimalInteraction {
 
-    fn get_subinteractions<'a>(&'a self) -> Vec<&'a Self> {
+    fn get_subinteractions(&self) -> Vec<&Self> {
         match self {
             MinimalInteraction::Strict(i1, i2) => {
                 vec![&*i1,&*i2]
@@ -98,65 +98,91 @@ impl FromInteractionTermToInternalRepresentation<MinimalLangCioII> for MinimalIn
     }
 
 
-    fn identify_pattern_at_interaction_root<'a>(&'a self) -> Option<(MinimalLeafPattern,Option<(MinimalOperators,&'a Self)>)> {
+    fn identify_pattern_at_interaction_leaf(&self) -> Option<MinimalLeafPattern> {
         match self {
             MinimalInteraction::Empty => {
-                return Some((MinimalLeafPattern::EMPTY,None));
+                Some(MinimalLeafPattern::EMPTY)
             },
             MinimalInteraction::Action(act) => {
-                return Some((act.to_pattern(),None));
-            },
-            MinimalInteraction::Strict(i1, i2) => {
-                if let MinimalInteraction::Action(ref emission) = **i1 {
-                    if emission.kind == MinimalActionKind::Emission {
-                        // if on the left of the strict we have an emission "act1 = l1!m1"
-                        if let Some((MinimalLeafPattern::BROADCAST(b2),_)) = i2.identify_pattern_at_interaction_root() {
-                            if b2.origin_lf_id.is_none() && b2.msg_id == emission.ms_id {
-                                // and on the right of the strict we have identified a pattern of the form "seq(l2?m1,...)" i.e.
-                                // a broadcast pattern with no known origin and the same message "m1"
-                                // then we return the broadcast, having found the origin as "l1" i.e. "act1.lf_id"
-
-                                let broadcast = MinimalBroadcastLeafPattern::new(
-                                    Some(emission.lf_id), 
-                                    emission.ms_id,
-                                    b2.targets
-                                );
-                                return Some((MinimalLeafPattern::BROADCAST(broadcast),None));
-                            }
-                        }
-                    } 
-                }
-                return None;
-            },
-            MinimalInteraction::Seq(i1, i2) => {
-                if let (
-                    Some((MinimalLeafPattern::BROADCAST(b1),_)),
-                    Some((MinimalLeafPattern::BROADCAST(b2),_))
-                ) = (i1.identify_pattern_at_interaction_root(),i2.identify_pattern_at_interaction_root()) {
-                    let same_message = b1.msg_id == b2.msg_id;
-                    let no_origin_b1 = b1.origin_lf_id.is_none();
-                    let no_origin_b2 = b2.origin_lf_id.is_none();
-                    if same_message && no_origin_b1 && no_origin_b2 {
-                        let mut targets = b1.targets;
-                        targets.extend(b2.targets);
-                        return Some(
-                            (MinimalLeafPattern::BROADCAST(
-                                MinimalBroadcastLeafPattern::new(
-                                    b1.origin_lf_id, 
-                                    b1.msg_id, 
-                                    targets
-                                )
-                            ),
-                            None)
-                        );
-                    }
-                }
-                return None;
+                Some(act.to_pattern())
             },
             _ => {
-                return None;
+                None
             }
-        };
+        }
+    }
+    
+    fn merge_patterns_under_operator_if_possible(
+        parent_op : &MinimalOperators,
+        p1 : &MinimalLeafPattern,
+        p2 : &MinimalLeafPattern
+    ) -> Option<MinimalLeafPattern> {
+        match (p1,p2) {
+            (MinimalLeafPattern::BROADCAST(b1),MinimalLeafPattern::BROADCAST(b2)) => {
+                match parent_op {
+                    MinimalOperators::Strict => {
+                        // b1 must be an emission and b2 a reception of the same message
+                        if b1.msg_id == b2.msg_id && 
+                        b1.origin_lf_id.is_some() && 
+                        b2.origin_lf_id.is_none() && 
+                        b2.targets.iter().all(|b2_tar| !b1.targets.contains(b2_tar)){
+                            let mut new_targs =b1.targets.clone();
+                            new_targs.extend(b2.targets.iter().cloned());
+                            let new_b = MinimalBroadcastLeafPattern::new(
+                                b1.origin_lf_id, 
+                                b1.msg_id, 
+                                new_targs
+                            );
+                            Some(MinimalLeafPattern::BROADCAST(new_b))
+                        } else {
+                            None 
+                        }
+                    },
+                    MinimalOperators::Seq => {
+                        // b1 and b2 must involve the same message
+                        // either both are receptions
+                        // or b1 is an emission occurring on the same lifeline than b2
+                        if b1.msg_id == b2.msg_id {
+                            match (b1.origin_lf_id, b2.origin_lf_id) {
+                                (None,None) => {
+                                    let mut new_targs =b1.targets.clone();
+                                    new_targs.extend(b2.targets.iter().cloned());
+                                    let new_b = MinimalBroadcastLeafPattern::new(
+                                        b1.origin_lf_id, 
+                                        b1.msg_id, 
+                                        new_targs
+                                    );
+                                    Some(MinimalLeafPattern::BROADCAST(new_b))
+                                },
+                                (Some(orig_lf),None) => {
+                                    if b1.targets.is_empty() && b2.targets == vec![orig_lf] {
+                                        let new_b = MinimalBroadcastLeafPattern::new(
+                                            b1.origin_lf_id, 
+                                            b1.msg_id, 
+                                            b2.targets.clone()
+                                        );
+                                        Some(MinimalLeafPattern::BROADCAST(new_b))
+                                    } else {
+                                        None 
+                                    }
+                                },
+                                (_,_) => {
+                                    None 
+                                }
+                            }
+                        } else {    
+                            None 
+                        }
+                    },
+                    _ => {
+                        None 
+                    }
+                }
+            },
+            (_,_) => {
+                None
+            }
+        }
     }
 
 }
