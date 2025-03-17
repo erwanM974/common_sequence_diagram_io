@@ -59,7 +59,7 @@ fn tool_test_verify_parsing_and_two_way_conversions(
     assert_eq!(expected_term, got_term);
 
     // finally we translate it back to an internal representation and verify that the result is correct
-    let retranslated_internal_repr = term.to_io_repr();
+    let retranslated_internal_repr = term.to_io_repr(true);
     let got_retranslated_internal_repr : String = format!("{:?}",retranslated_internal_repr).chars().filter(|c| !c.is_whitespace()).collect();
     assert_eq!(expected_internal_repr, got_retranslated_internal_repr);
 

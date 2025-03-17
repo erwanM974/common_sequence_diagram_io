@@ -84,7 +84,10 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
     /** 
      * Conversion from the concrete interaction language to this crate's internal representation.
      * **/
-     fn to_io_repr(&self) -> InteractionInternalRepresentation<CioII> {
+     fn to_io_repr(
+        &self,
+        merge_patterns : bool
+    ) -> InteractionInternalRepresentation<CioII> {
         match self.identify_pattern_at_interaction_leaf() {
             Some(pattern) => {
                 let pattern_int_repr = InteractionInternalRepresentation::LeafPattern(pattern);
@@ -102,25 +105,32 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
                 let mut operands = vec![];
                 let mut last_pattern : Option<<CioII as CommonIoInteractionInterface>::InteractionLeafPatternType> = None;
                 for raw_op in raw_operands {
-                    let operand_io_repr = raw_op.to_io_repr();
+                    let operand_io_repr = raw_op.to_io_repr(merge_patterns);
                     match operand_io_repr {
                         InteractionInternalRepresentation::LeafPattern(pt) => {
                             match last_pattern {
                                 Some(prev_pt) => {
-                                    match Self::merge_patterns_under_operator_if_possible(
-                                        &op_at_root, 
-                                        &prev_pt, 
-                                        &pt
-                                    ) {
-                                        None => {
-                                            operands.push(
-                                                InteractionInternalRepresentation::LeafPattern(prev_pt)
-                                            );
-                                            last_pattern = Some(pt);
-                                        },
-                                        Some(merged_pt) => {
-                                            last_pattern = Some(merged_pt);
+                                    if merge_patterns {
+                                        match Self::merge_patterns_under_operator_if_possible(
+                                            &op_at_root, 
+                                            &prev_pt, 
+                                            &pt
+                                        ) {
+                                            None => {
+                                                operands.push(
+                                                    InteractionInternalRepresentation::LeafPattern(prev_pt)
+                                                );
+                                                last_pattern = Some(pt);
+                                            },
+                                            Some(merged_pt) => {
+                                                last_pattern = Some(merged_pt);
+                                            }
                                         }
+                                    } else {
+                                        operands.push(
+                                            InteractionInternalRepresentation::LeafPattern(prev_pt)
+                                        );
+                                        last_pattern = Some(pt);
                                     }
                                 },
                                 None => {
