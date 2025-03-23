@@ -14,16 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+use core::num;
+
 use nom::branch::alt;
 use nom::character::complete::multispace0;
-use nom::combinator::map;
+use nom::combinator::{fail, map};
 use nom::multi::separated_list0;
 use nom::sequence::{delimited, tuple};
 use nom::IResult;
-use nom::error::ParseError;
+use nom::error::{make_error, ParseError};
 
-use crate::internal_representation::{InteractionInternalRepresentation,CommonIoInteractionInterface};
+use crate::internal_representation::{CommonIoInteractionInterface, InteractionInternalRepresentation, InteractionOperatorRepresentation};
 use crate::from_text::util::delimited_lang_parser::DelimitedInteractionLanguageParser;
+
+
+
+
+
 
 pub trait ContextAwareInteractionParser<CioII : CommonIoInteractionInterface> : DelimitedInteractionLanguageParser {
 
@@ -61,9 +68,20 @@ pub trait ContextAwareInteractionParser<CioII : CommonIoInteractionInterface> : 
                 nom::character::complete::char(self.right_parenthesis_char())
             )
         );
-        parser(input).map(|(rem, (operator, _, _, _, operands,_,_))| {
-            (rem, InteractionInternalRepresentation::Operator(operator,operands))
-        })
+        match parser(input) {
+            IResult::Ok((rem, (operator, _, _, _, operands,_,_))) => {
+                let arity = operator.arity();
+                let num_operands = operands.len();
+                if (operator.is_associative() && num_operands >= 2) || (num_operands==arity) {
+                    IResult::Ok((rem, InteractionInternalRepresentation::Operator(operator,operands)))
+                } else {
+                    IResult::Err(nom::Err::Error(make_error::<&'a str, E>(input, nom::error::ErrorKind::Count)))
+                }
+            },
+            IResult::Err(e) => {
+                IResult::Err(e)
+            }
+        }
     }
 
     fn parse_interaction_inner<'a, E: ParseError<&'a str>>(&self,
@@ -89,50 +107,6 @@ pub trait ContextAwareInteractionParser<CioII : CommonIoInteractionInterface> : 
             multispace0
         )(input)
 
-        /*
-
-        
-        if let Ok((r,op_kind)) = self.parse_operator(input_str) {
-            let first_char_after_operator = r.chars().next().unwrap();
-            if first_char_after_operator.eq(&self.left_parenthesis_char()) {
-                let mut remainder = "";
-                let mut current_r = &r[1..];
-                let mut operands = vec![];
-                'iter_operands : loop {
-                    if let Ok((r2,inner_int)) = self.parse_interaction_inner::<E>(current_r) {
-                        operands.push(inner_int);
-                        let first_char_after_operand = r2.chars().next().unwrap();
-                        if first_char_after_operand.eq(&self.right_parenthesis_char()) {
-                            remainder = &r2[1..];
-                            break 'iter_operands;
-                        } else if first_char_after_operand.eq(&self.separator_char()) {
-                            current_r = &r2[1..];
-                        }
-                    } else {
-                        break 'iter_operands;
-                    }
-                }
-                // ***
-                let number_of_operands = operands.len();
-                let is_arity_ok = if op_kind.is_associative() {
-                    // if associative, any number >=2 is ok
-                    number_of_operands >= 2
-                } else {
-                    number_of_operands == op_kind.arity()
-                };
-                if is_arity_ok {
-                    let i = InteractionInternalRepresentation::Operator(
-                        op_kind,
-                        operands
-                    );
-                    return Ok((remainder,i));
-                }
-            } 
-        }
-
-
-        // otherwise could not parse the interaction, hence returns the sequence of encountered failures
-        return Err(Error(nom::error::make_error(input_str, ErrorKind::Fail)));*/
     }
 
 }

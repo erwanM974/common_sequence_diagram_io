@@ -37,7 +37,6 @@ where
     CioII : CommonIoInteractionInterface,
     Parser : ContextAwareInteractionParser<CioII>
 {
-    //let input_str_no_white_space : String = input_str.chars().filter(|c| !c.is_whitespace()).collect();
     match parser.parse_interaction_inner::<VerboseError<&str>>(input_str) {
         Err(nom::Err::Error(e)) | Err(nom::Err::Failure(e)) => {
             Err(nom::error::convert_error(input_str, e))

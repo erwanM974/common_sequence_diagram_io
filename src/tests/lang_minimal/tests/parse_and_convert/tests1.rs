@@ -14,71 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+use crate::tests::lang_minimal::minimal_lang::GeneralContext;
+
+use super::tool_test_parse_and_convert::tool_test_verify_parsing_and_two_way_conversions;
 
 
 
-use std::path::Path;
-
-use crate::tests::lang_minimal::core::internal_representation::*;
-use crate::tests::lang_minimal::minimal_lang::{GeneralContext, MinimalInteraction};
-use crate::from_text::parse::parse_interaction;
-use crate::tests::lang_minimal::to_image::drawing_context::MinimalDrawingContext;
-use crate::to_text::print::print_interaction;
-use crate::conversion::lang_to_repr::FromInteractionTermToInternalRepresentation;
-use crate::conversion::repr_to_lang::FromInternalRepresentationToInteractionTerm;
-
-use crate::to_image::interface::draw_interaction_as_sequence_diagram;
-
-
-/**
- * Parses the input text (that contains a textual description of the interaction) with knowledge of the context.
- * Then produces the internal representation of that interaction.
- * It then compares it to the expected result.
- * If ok, it converts it into a concrete interaction term.
- * Then compares it to the expected value.
- * Then converts it back to the internal representation.
- * And performs the final verification.
- * **/
-fn tool_test_verify_parsing_and_two_way_conversions(
-        ctx : GeneralContext, 
-        input_text : &str, 
-        expected_internal_repr : String, 
-        expected_term : String,
-        interaction_name : String
-    ) {
-    // we parse the input text and verifify that the obtained internal representation is indeed the expected one
-    let internal_repr = parse_interaction::<MinimalLangCioII,GeneralContext>(
-        input_text,&ctx
-    ).unwrap();
-    let got_internal_repr : String = format!("{:?}",internal_repr).chars().filter(|c| !c.is_whitespace()).collect();
-    assert_eq!(expected_internal_repr, got_internal_repr);
-
-    // we translate the internal representation to a term in the concrete interaction language and verify that it is indeed the expected one
-    let term = MinimalInteraction::from_io_repr(&internal_repr);
-    let got_term : String = format!("{:?}",term).chars().filter(|c| !c.is_whitespace()).collect();
-    assert_eq!(expected_term, got_term);
-
-    // finally we translate it back to an internal representation and verify that the result is correct
-    let retranslated_internal_repr = term.to_io_repr(true);
-    let got_retranslated_internal_repr : String = format!("{:?}",retranslated_internal_repr).chars().filter(|c| !c.is_whitespace()).collect();
-    assert_eq!(expected_internal_repr, got_retranslated_internal_repr);
-
-    // we also print the internal representation in text form to see if we have the same as the input text
-    let reprinted = print_interaction(&retranslated_internal_repr, &ctx);
-    let reprinter_no_whitespace : String = reprinted.chars().filter(|c| !c.is_whitespace()).collect();
-    let input_no_whitespace : String = input_text.chars().filter(|c| !c.is_whitespace()).collect();
-    assert_eq!(reprinter_no_whitespace,input_no_whitespace);
-
-    // finally, we draw as an image
-
-    let drawing_context = MinimalDrawingContext::new(ctx);
-    draw_interaction_as_sequence_diagram::<MinimalLangCioII,usize,MinimalDrawingContext,MinimalDrawingContext>(
-        &retranslated_internal_repr,
-        &drawing_context,
-        &drawing_context,
-        &Path::new(&format!("{}.png",interaction_name))
-    );
-}
 
 
 
@@ -128,7 +69,13 @@ Seq(
 )
     "#.chars().filter(|c| !c.is_whitespace()).collect();
 
-    tool_test_verify_parsing_and_two_way_conversions(ctx, input_text, expected_internal_repr, expected_term, "test1".to_owned());
+    tool_test_verify_parsing_and_two_way_conversions(
+        &ctx, 
+        input_text, 
+        &expected_internal_repr,
+        &expected_term, 
+        None
+    );
 }
 
 
@@ -190,8 +137,15 @@ Seq(
 )
     "#.chars().filter(|c| !c.is_whitespace()).collect();
 
-    tool_test_verify_parsing_and_two_way_conversions(ctx, input_text, expected_internal_repr, expected_term,"test2".to_owned());
+    tool_test_verify_parsing_and_two_way_conversions(
+        &ctx, 
+        input_text, 
+        &expected_internal_repr,
+        &expected_term, 
+        None
+    );
 }
+
 
 
 
@@ -283,10 +237,14 @@ Seq(
 )
     "#.chars().filter(|c| !c.is_whitespace()).collect();
 
-    tool_test_verify_parsing_and_two_way_conversions(ctx, input_text, expected_internal_repr, expected_term,"test3".to_owned());
+    tool_test_verify_parsing_and_two_way_conversions(
+        &ctx, 
+        input_text, 
+        &expected_internal_repr,
+        &expected_term, 
+        None
+    );
 }
-
-
 
 
 

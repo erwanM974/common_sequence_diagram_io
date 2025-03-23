@@ -86,7 +86,8 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
      * **/
      fn to_io_repr(
         &self,
-        merge_patterns : bool
+        merge_patterns : bool,
+        flatten_operands_under_associative_operators : bool
     ) -> InteractionInternalRepresentation<CioII> {
         match self.identify_pattern_at_interaction_leaf() {
             Some(pattern) => {
@@ -97,7 +98,7 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
                 // patterns must cover all non-operator symbols (more precisely all operators of arity 0)
                 // so here we must be able to identify the root operator
                 let op_at_root = self.get_operator_at_root().unwrap();
-                let raw_operands = if op_at_root.is_associative() {
+                let raw_operands = if flatten_operands_under_associative_operators && op_at_root.is_associative() {
                     self.get_associative_operands_recursively(&op_at_root)
                 } else {
                     self.get_subinteractions()
@@ -105,7 +106,10 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
                 let mut operands = vec![];
                 let mut last_pattern : Option<<CioII as CommonIoInteractionInterface>::InteractionLeafPatternType> = None;
                 for raw_op in raw_operands {
-                    let operand_io_repr = raw_op.to_io_repr(merge_patterns);
+                    let operand_io_repr = raw_op.to_io_repr(
+                        merge_patterns,
+                        flatten_operands_under_associative_operators
+                    );
                     match operand_io_repr {
                         InteractionInternalRepresentation::LeafPattern(pt) => {
                             match last_pattern {
