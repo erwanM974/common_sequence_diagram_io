@@ -170,7 +170,7 @@ pub fn extract_intermediate_drawing_information_rec<CioII,LI,Context>
                             l1_idx.cmp(&l2_idx)
                         }
                     ) {
-                    let letftmost_lf_reqs = lifelines_reqs.get_mut(&leftmost_lf_id).unwrap();
+                    let letftmost_lf_reqs = lifelines_reqs.get_mut(leftmost_lf_id).unwrap();
                     letftmost_lf_reqs.on_the_left = f32::max(
                         letftmost_lf_reqs.on_the_left, 
                         operator_info.required_horizontal_space_at_left_most_lifeline

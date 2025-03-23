@@ -91,8 +91,7 @@ pub trait FromInteractionTermToInternalRepresentation<CioII : CommonIoInteractio
     ) -> InteractionInternalRepresentation<CioII> {
         match self.identify_pattern_at_interaction_leaf() {
             Some(pattern) => {
-                let pattern_int_repr = InteractionInternalRepresentation::LeafPattern(pattern);
-                pattern_int_repr
+                InteractionInternalRepresentation::LeafPattern(pattern)
             },
             None => {
                 // patterns must cover all non-operator symbols (more precisely all operators of arity 0)

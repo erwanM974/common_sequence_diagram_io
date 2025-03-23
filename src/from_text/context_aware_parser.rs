@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-use core::num;
 
 use nom::branch::alt;
 use nom::character::complete::multispace0;
-use nom::combinator::{fail, map};
+use nom::combinator::map;
 use nom::multi::separated_list0;
 use nom::sequence::{delimited, tuple};
 use nom::IResult;
